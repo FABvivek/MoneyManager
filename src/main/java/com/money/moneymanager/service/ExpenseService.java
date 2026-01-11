@@ -76,6 +76,14 @@ public class ExpenseService {
         return list.stream().map(this::toDTO).toList();
     }
 
+    //Notification
+    public List<ExpenseDTO> getExpensesForUserOnDate(Long profileId, LocalDate date ){
+        List<ExpenseEntity> list = expenseRepository.findByProfileIdAndDate(profileId,date);
+        return list.stream().map(this::toDTO).toList();
+    }
+
+
+
 
 
 
