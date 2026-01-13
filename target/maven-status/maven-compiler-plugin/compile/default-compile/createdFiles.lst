@@ -32,6 +32,7 @@ com\money\moneymanager\security\JwtRequestFilter.class
 com\money\moneymanager\entity\ProfileEntity$ProfileEntityBuilder.class
 com\money\moneymanager\service\IncomeService.class
 com\money\moneymanager\dto\FilterDTO.class
+com\money\moneymanager\config\WebClientConfig.class
 com\money\moneymanager\controller\FilterController.class
 com\money\moneymanager\service\DashboardService.class
 com\money\moneymanager\repositorty\ProfileRepository.class
