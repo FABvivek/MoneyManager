@@ -1,32 +1,53 @@
 package com.money.moneymanager.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
+@Slf4j
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private final WebClient webClient;
 
-    @Value("${spring.mail.properties.mail.smtp.from}")
-    private String mailFrom ;
+    public EmailService(
+            WebClient.Builder builder,
+            @Value("${brevo.api.key}") String apiKey,
+            @Value("${brevo.api.url}") String apiUrl
+    ) {
+        this.webClient = builder
+                .baseUrl(apiUrl)
+                .defaultHeader("api-key", apiKey)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
 
     public void sendEmail(String to, String subject, String body) {
 
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(mailFrom);
-            message.setTo(to);
-            message.setSubject(subject);
-            message.setText(body);
-            mailSender.send(message);
-        } catch (Exception e) {
-           throw new RuntimeException(e.getMessage());
-        }
-    }
+        Map<String, Object> payload = Map.of(
+                "sender", Map.of(
+                        "name", "Money Manager",
+                        "email", "vivekwillcode@gmail.com"
+                ),
+                "to", List.of(
+                        Map.of("email", to)
+                ),
+                "subject", subject,
+                "htmlContent", body
+        );
 
+        webClient.post()
+                .bodyValue(payload)
+                .retrieve()
+                .bodyToMono(String.class)
+                .doOnSuccess(r -> log.info("Email sent to {}", to))
+                .doOnError(e -> log.error("Email sending failed", e))
+                .subscribe(); // async, non-blocking
+    }
 }

@@ -33,7 +33,7 @@ public class SecurityConfig {
         httpSecurity.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/status","/health","/register","/activate","/login").permitAll()
+                        .requestMatchers("/status","/health","/register","/activate","/login","/test/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))// so we can use JWT token
